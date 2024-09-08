@@ -9,13 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * stores deleted notes to recycle bin & a chron job will remove 30 day stale notes
+ */
 @Data
 @NoArgsConstructor
-@Document(collection = "noteEntry",
-        collation = "en"    // collation to set for local-time https://www.mongodb.com/docs/manual/reference/collation-locales-defaults/
-)
-public class NoteEntry {
+@Document(collection = "noteRecycleBin", collation = "en")
+public class NoteRecycleBin {
 
     @Id
     private ObjectId id;
@@ -24,5 +24,8 @@ public class NoteEntry {
     private String content;
     private LocalDateTime entryTimeStamp;
     private LocalDateTime lastUpdateTimeStamp;
+    private LocalDateTime deletionTimeStamp; //day when record was deleted
+    private LocalDateTime lastAccessTmeStamp; //day when note in recycle bin was accessed
+    private LocalDateTime expiryTimeStamp; //day +30 days from lastAccessTmeStamp to expire note
 
 }

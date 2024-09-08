@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +49,7 @@ public class NoteEntryrController {
         }
     }
 
-    @GetMapping("id/{noteId}")
+    @GetMapping("noteId/{noteId}")
     public ResponseEntity<NoteEntry> getNoteById(@PathVariable ObjectId noteId) {
         Optional<NoteEntry> foundNote =  entryService.findNoteById(noteId);
         return foundNote.map(note ->
@@ -60,9 +59,10 @@ public class NoteEntryrController {
         );
     }
 
-    @DeleteMapping("remove/{noteId}")
-    public ResponseEntity<?> deleteNoteById(@PathVariable ObjectId noteId) {
-        entryService.deleteNoteById(noteId);
+    //cascade delete of a note
+    @DeleteMapping("remove/noteId/{noteId}/username/{username}")
+    public ResponseEntity<?> deleteNoteById(@PathVariable ObjectId noteId, @PathVariable String username) {
+        entryService.deleteNoteById(noteId, username);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -70,7 +70,8 @@ public class NoteEntryrController {
     public ResponseEntity<?> updateNoteById(@RequestBody NoteEntry note, @PathVariable ObjectId noteId, @PathVariable String username) {
         note.setLastUpdateTimeStamp(LocalDateTime.now());
         note.setId(noteId);
-        boolean isNoteForUserPresent = false;        Optional<NoteEntry> noteFound = Optional.of(new NoteEntry());
+        boolean isNoteForUserPresent = false;
+        Optional<NoteEntry> noteFound = Optional.of(new NoteEntry());
 
         Optional<User> user = userService.findUserByUsername(username);
         if (user.isPresent()) {
